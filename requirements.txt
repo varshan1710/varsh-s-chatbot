@@ -1,0 +1,12 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+google-genai>=1.16.0
+python-dotenv==1.0.1
+pydantic==2.8.2
+pydantic-settings==2.4.0
+python-multipart==0.0.9
+pymongo==4.17.0
+motor==3.7.1
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0
+passlib==1.7.4

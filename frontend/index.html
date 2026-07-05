@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Varsh's Personal AI — A production-quality, secure AI assistant. Chat intelligently, get fast answers, and explore ideas securely." />
+  <meta name="theme-color" content="#0a0e1a" />
+  <title>Varsh's Personal AI — AI Assistant</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     LOGIN OVERLAY
+     ════════════════════════════════════════ -->
+<div id="login-overlay" class="login-overlay active" role="dialog" aria-modal="true" aria-labelledby="login-title">
+  <div class="login-card">
+    <div class="login-orb">✨</div>
+    <div class="login-header">
+      <h2 id="login-title">Varsh's Personal AI</h2>
+      <p class="login-desc">Authorized Access Only</p>
+    </div>
+    <form id="login-form">
+      <div class="input-group">
+        <label for="username">Access ID</label>
+        <input
+          type="text"
+          id="username"
+          placeholder="Enter ID"
+          required
+          autocomplete="username"
+        />
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter Password"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+      <div id="login-error" class="login-error-msg"></div>
+      <button type="submit" id="login-submit-btn">
+        Authenticate
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="app" style="display: none;">
+
+  <!-- ════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════ -->
+  <aside class="sidebar" role="complementary" aria-label="Chat sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-icon" role="img" aria-label="Varsh's Personal AI logo">✨</div>
+      <div class="logo-text">
+        <span class="logo-title">VP AI</span>
+        <span class="logo-subtitle">Personal Assistant</span>
+      </div>
+    </div>
+
+    <!-- New Chat Button -->
+    <button id="new-chat-btn" aria-label="Start a new conversation">
+      <span>＋</span>
+      <span>New Conversation</span>
+    </button>
+
+    <!-- Status -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Status</div>
+      <div class="session-info">
+        <div class="session-row">
+          <span class="session-label">Connection</span>
+          <div class="status-badge">
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-text">Connecting…</span>
+          </div>
+        </div>
+        <div class="session-row">
+          <span class="session-label">Session</span>
+          <span class="session-value" id="session-id-display" title="">—</span>
+        </div>
+        <div class="session-row">
+          <span class="session-label">Messages</span>
+          <span class="session-value" id="msg-count-display">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model Selector -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">AI Model</div>
+      <select
+        class="model-selector"
+        id="model-select"
+        aria-label="Select AI model"
+        title="Model selection is informational. Change MODEL in .env to switch."
+      >
+        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+      </select>
+      <div style="font-size:11px;color:var(--text-muted);padding:4px 4px 0;line-height:1.5">
+        Active model set securely in <code style="font-size:11px;color:var(--text-code)">.env</code>
+      </div>
+    </div>
+
+    <!-- API Docs link -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Developer</div>
+      <div class="session-info">
+        <div class="session-row">
+          <span class="session-label">API Docs</span>
+          <a
+            href="/docs"
+            target="_blank"
+            rel="noopener"
+            style="font-size:12px;color:var(--accent-secondary);text-decoration:none"
+          >
+            Open ↗
+          </a>
+        </div>
+        <div class="session-row">
+          <span class="session-label">Health</span>
+          <a
+            href="/api/health"
+            target="_blank"
+            rel="noopener"
+            style="font-size:12px;color:var(--accent-secondary);text-decoration:none"
+          >
+            Check ↗
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="sidebar-footer" role="contentinfo">
+      <div class="sidebar-footer-icon">🤖</div>
+      <div class="sidebar-footer-text">
+        <span class="sidebar-footer-title">Varsh's Personal AI</span>
+        <span class="sidebar-footer-sub" id="current-model-label">gemini-2.5-flash</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ════════════════════════════════════════
+       MAIN CHAT AREA
+  ════════════════════════════════════════ -->
+  <main class="chat-container" role="main">
+
+    <!-- Chat Header -->
+    <header class="chat-header">
+      <div class="chat-header-left">
+        <h1 class="chat-title">Varsh's Personal AI</h1>
+        <p class="chat-subtitle">Secure personal assistant powered by Google Gemini</p>
+      </div>
+      <div class="chat-header-right">
+        <button
+          class="header-btn"
+          id="clear-chat-header-btn"
+          onclick="startNewChat()"
+          title="New conversation"
+          aria-label="Start new conversation"
+        >🗑</button>
+        <button
+          class="header-btn"
+          id="logout-btn"
+          title="Logout"
+          aria-label="Logout"
+        >🚪</button>
+      </div>
+    </header>
+
+    <!-- Messages -->
+    <div
+      id="messages-container"
+      role="log"
+      aria-live="polite"
+      aria-label="Chat messages"
+    >
+
+      <!-- Welcome Screen (shown before first message) -->
+      <div id="welcome-screen">
+        <div class="welcome-orb" role="img" aria-label="AI sparkle">✨</div>
+        <div class="welcome-text">
+          <h2>Hello! I'm Varsh's Personal AI</h2>
+          <p>
+            Your private, secure assistant. Ask me anything — I'm here to help you think, create, and explore.
+          </p>
+        </div>
+        <div class="welcome-suggestions" role="group" aria-label="Conversation starters">
+          <button class="suggestion-card" id="suggestion-1" aria-label="Suggest: Explain quantum computing">
+            <span class="suggestion-icon" aria-hidden="true">💡</span>
+            <span class="suggestion-text">Explain quantum computing in simple terms</span>
+          </button>
+          <button class="suggestion-card" id="suggestion-2" aria-label="Suggest: Python function">
+            <span class="suggestion-icon" aria-hidden="true">🐍</span>
+            <span class="suggestion-text">Write a Python function to sort a list of dicts</span>
+          </button>
+          <button class="suggestion-card" id="suggestion-3" aria-label="Suggest: Professional email">
+            <span class="suggestion-icon" aria-hidden="true">✍️</span>
+            <span class="suggestion-text">Help me write a professional email</span>
+          </button>
+          <button class="suggestion-card" id="suggestion-4" aria-label="Suggest: App ideas">
+            <span class="suggestion-icon" aria-hidden="true">🎨</span>
+            <span class="suggestion-text">Give me creative ideas for a mobile app</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div id="typing-indicator" role="status" aria-label="AI is typing">
+        <div class="typing-avatar" aria-hidden="true">✨</div>
+        <div class="typing-bubble" aria-hidden="true">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+    </div><!-- /#messages-container -->
+
+    <!-- Input Area -->
+    <footer class="input-area">
+      <div class="input-wrapper">
+        <div class="input-box">
+          <textarea
+            id="message-input"
+            placeholder="Ask me anything… (Enter to send, Shift+Enter for newline)"
+            rows="1"
+            aria-label="Type your message"
+            autocomplete="off"
+            spellcheck="true"
+          ></textarea>
+          <button
+            id="send-btn"
+            aria-label="Send message"
+            title="Send (Enter)"
+          >
+            ➤
+          </button>
+        </div>
+        <p class="input-hint">
+          <kbd>Enter</kbd> to send &nbsp;·&nbsp;
+          <kbd>Shift</kbd>+<kbd>Enter</kbd> for newline
+        </p>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

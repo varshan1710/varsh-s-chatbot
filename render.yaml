@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: varsh-s-chatbot
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+        placeholder: "Enter your Google Gemini API Key"
+      - key: MODEL
+        value: "gemini-2.5-flash"
+      - key: TEMPERATURE
+        value: "0.7"
+      - key: MAX_OUTPUT_TOKENS
+        value: "2048"
+      - key: SYSTEM_PROMPT
+        value: "You are a helpful, friendly, and intelligent AI assistant."
+      - key: APP_NAME
+        value: "Varsh's Personal AI"
+      - key: AUTH_USER_ID
+        value: "24ADR172"
+      - key: AUTH_PASSWORD_HASH
+        value: "$2b$12$ZgdFqUFSMpIFyO1dxJtCSuWLiG/D6gbn8MCpGxSNL8Z4qROSXEs42"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: "HS256"
+      - key: JWT_EXPIRE_HOURS
+        value: "8"
